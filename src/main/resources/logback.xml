@@ -30,7 +30,7 @@
     <logger name="org.fuga.mock" level="INFO"/>
 
 
-    <root level="warn">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

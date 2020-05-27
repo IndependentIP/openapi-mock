@@ -21,8 +21,11 @@ package org.fuga.mock;
  */
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.admin.tasks.GetAllStubMappingsTask;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.common.Metadata;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
@@ -44,7 +47,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.common.Metadata.metadata;
+import static com.github.tomakehurst.wiremock.core.WireMockApp.MAPPINGS_ROOT;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static wiremock.org.apache.commons.lang3.math.NumberUtils.isParsable;
 
 /**
@@ -63,7 +69,7 @@ public class OpenApiMock {
 
     public static void main(String[] args) {
         // TODO: properly parse input arguments
-        new OpenApiMock("cfg", 8000);
+        new OpenApiMock("cfg", 5868);
     }
 
     /**
@@ -78,11 +84,21 @@ public class OpenApiMock {
      */
     public OpenApiMock(int port) {
         log.info("Starting MockServer listening on port {}", port);
-        wireMockServer = new WireMockServer(
-                wireMockConfig()
-                        .port(port)
-                        .notifier(new Slf4jNotifier(true))
-                        .extensions(ExpectedExtension.class));
+//        wireMockServer = new WireMockServer(
+//                wireMockConfig()
+//                        .port(port)
+//                        .notifier(new Slf4jNotifier(true))
+//                        .extensions(ExpectedExtension.class)
+//                        .usingFilesUnderClasspath("/ui")
+//                        .mappingSource(new CustomMappingSource(filesRoot().child(MAPPINGS_ROOT))));
+        //.usingFilesUnderDirectory("./wiremock"));
+        WireMockConfiguration option = options();
+        option.port(port);
+        option.usingFilesUnderClasspath("ui");
+        option.extensions(ExpectedExtension.class);
+        //option.mappingSource(new CustomMappingSource(option.filesRoot().child(MAPPINGS_ROOT)));
+        wireMockServer = new WireMockServer(option);
+
         wireMockServer.start();
     }
 
@@ -116,7 +132,7 @@ public class OpenApiMock {
         log.info("Create swagger model from yaml files in  {}", swaggerFolder);
 
         // Remove any previously defined stubs
-        reset();
+        //reset();
 
         File folder = new File(swaggerFolder);
         if (folder.isDirectory()) {
@@ -219,6 +235,7 @@ public class OpenApiMock {
         }
 
         stub.withName(operation.getOperationId());
+        stub.withMetadata(metadata().attr("file_name","open-api").build());
         return stub;
     }
 

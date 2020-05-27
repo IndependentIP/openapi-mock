@@ -184,7 +184,7 @@ public class OpenApiMock {
     /**
      * Creates stub for specified URL
      */
-    private MappingBuilder createMock(final PathItem.HttpMethod method, final String url) {
+    private MappingBuilder createMock(final PathItem.HttpMethod method, final String url, final Operation operation) {
         // Replace path parameter place holders by regular expression.
         String wiremockCompatibleUrl = url.replaceAll("\\{.*\\}", ".*");
 
@@ -215,6 +215,7 @@ public class OpenApiMock {
                 throw new Error("Unsupported HTTP Method");
         }
 
+        stub.withName(operation.getOperationId());
         return stub;
     }
 
@@ -222,7 +223,7 @@ public class OpenApiMock {
      * Creates mock for specified URL
      */
     private MappingBuilder createMockWithQueryParameters(final PathItem.HttpMethod method, final String url, final Operation operation) {
-        final MappingBuilder mock = createMock(method, url);
+        final MappingBuilder mock = createMock(method, url, operation);
 
         // Add matchers for query parameters
         // TODO: Add matching of query parameters and/or headers
@@ -283,7 +284,7 @@ public class OpenApiMock {
 
             log.info("Creating default response for bad request [{}]:{}",
                     method, url);
-            MappingBuilder stub = createMock(method, url);
+            MappingBuilder stub = createMock(method, url, operation);
 
             // Create response for request without mandatory query parameters
             stub.willReturn(

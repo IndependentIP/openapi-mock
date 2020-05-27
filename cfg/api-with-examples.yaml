@@ -50,7 +50,7 @@ paths:
               {
                   "versions": [
                       {
-                          "status": "CURRENT",
+                          "status": "LATEST",
                           "updated": "2011-01-21T11:33:21Z",
                           "id": "v2.5",
                           "links": [

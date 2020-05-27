@@ -9,9 +9,9 @@ package org.fuga.mock;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -78,8 +78,11 @@ public class OpenApiMock {
      */
     public OpenApiMock(int port) {
         log.info("Starting MockServer listening on port {}", port);
-        wireMockServer = new WireMockServer(wireMockConfig().port(port)
-                .notifier(new Slf4jNotifier(true)));
+        wireMockServer = new WireMockServer(
+                wireMockConfig()
+                        .port(port)
+                        .notifier(new Slf4jNotifier(true))
+                        .extensions(ExpectedExtension.class));
         wireMockServer.start();
     }
 
@@ -228,13 +231,13 @@ public class OpenApiMock {
         // Add matchers for query parameters
         // TODO: Add matching of query parameters and/or headers
         toStream(operation.getParameters()).forEach(parameter -> {
-                log.debug("Processing parameter {}", parameter.getIn());
-                if (Optional.ofNullable(parameter.getRequired()).orElse(false)) {
-                    if (parameter.getIn().equalsIgnoreCase("query")) {
-                        mock.withQueryParam(parameter.getName(),
-                                matching(createRegularExpression()));
-                    }
+            log.debug("Processing parameter {}", parameter.getIn());
+            if (Optional.ofNullable(parameter.getRequired()).orElse(false)) {
+                if (parameter.getIn().equalsIgnoreCase("query")) {
+                    mock.withQueryParam(parameter.getName(),
+                            matching(createRegularExpression()));
                 }
+            }
         });
 
         return mock;
@@ -257,11 +260,15 @@ public class OpenApiMock {
         }
 
         if (responseStatus != 200) {
-            // In case example not response for success expected-response header must match
+            // In case example not response for success expected-response header or defined expectation must match
             stub.andMatching(value -> {
-                String expectedResponseStatus = value.getHeader(EXPECTED_RESPONSE);
-                return MatchResult.of(isParsable(expectedResponseStatus) && responseStatus == Integer.parseInt(expectedResponseStatus));
-            }
+                        String expectedResponseStatus = value.getHeader(EXPECTED_RESPONSE);
+
+                        if (expectedResponseStatus == null) {
+                            expectedResponseStatus = ExpectedExtension.getExpectedResponse(operation.getOperationId());
+                        }
+                        return MatchResult.of(isParsable(expectedResponseStatus) && responseStatus == Integer.parseInt(expectedResponseStatus));
+                    }
             );
         }
 
@@ -330,9 +337,9 @@ public class OpenApiMock {
                         final MediaType mediaType = mediaTypeDef.getValue();
 
                         toStream(mediaType.getExamples()).forEach(exampleDef -> {
-                                // Will create response which will be returned if expected_example header is specified
-                                wireMockServer.stubFor(
-                                        createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), exampleDef.getKey(), exampleDef.getValue().toString()));
+                            // Will create response which will be returned if expected_example header is specified
+                            wireMockServer.stubFor(
+                                    createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), exampleDef.getKey(), exampleDef.getValue().toString()));
                         });
 
                         Optional.ofNullable(mediaType.getExample()).ifPresent(example -> {

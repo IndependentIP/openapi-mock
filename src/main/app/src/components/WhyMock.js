@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import React, { PureComponent } from "react";
-import logoWireMock from "../../public/wiremock.png";
+import logoOpenApiMock from "../../public/OpenAPI-Mock-logo.png";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import _ from "lodash";
 import { __esModule } from "react-treebeard/dist";
@@ -22,6 +22,14 @@ import querySearch from "stringquery";
 import Select from "react-select";
 import { SplitButton, Dropdown, Button } from "react-bootstrap";
 import { connect } from "react-redux";
+
+// Dependencies for icons within UI
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+library.add(
+  fas,
+)
 
 import Request from "./Request";
 import Response from "./Response";
@@ -200,7 +208,7 @@ const Header = ({
 }) => (
   <div className="row header-row">
     <div className="col-sm-2 header-img">
-      <img alt="WhyMock" src={logoWireMock} />
+      <img width="100%" alt="OpenApi-Mock" src={logoOpenApiMock} />
     </div>
     <div className="col-sm-6 suggestionZone">{children}</div>
     <div className="col-sm-4 right-toolbar">
@@ -213,44 +221,38 @@ const Header = ({
         variant="secondary"
       >
         <Dropdown.Item href="#/action-1" onClick={showContextModal}>
-          <i className="fa fa-rocket"></i> Change context
+          <i><FontAwesomeIcon icon={['fas', 'rocket']}/></i> Change context
         </Dropdown.Item>
         <Dropdown.Item href="#/action-1" onClick={refreshStubs}>
-          <i className="fa fa-refresh"></i> Refresh
+          <i><FontAwesomeIcon icon={['fas', 'sync-alt']}/></i> Refresh
         </Dropdown.Item>
         <Dropdown.Item href="#/action-1" onClick={showUploadModal}>
-          <i className="fa fa-cloud-upload"></i> Upload stubs
+          <i><FontAwesomeIcon icon={['fas', 'upload']}/></i> Upload stubs
         </Dropdown.Item>
         <Dropdown.Item href="#/action-2" onClick={showSettingModal}>
-          <i className="fa fa-cog"></i> Setting
+          <i><FontAwesomeIcon icon={['fas', 'cog']}/></i> Setting
         </Dropdown.Item>
         <Dropdown.Divider />
         <Dropdown.Item href="#/action-3" onClick={showAboutModal}>
-          <i className="fa fa-info-circle"></i> About
+          <i><FontAwesomeIcon icon={['fas', 'info-circle']}/></i> About
         </Dropdown.Item>
       </SplitButton>
       <Button
         className="btn btn-success btn-sm button-header-2"
-        onClick={refreshStubs}
-      >
-        <i className="fa fa-refresh"></i>
+        onClick={refreshStubs}>
+        <i><FontAwesomeIcon icon={['fas', 'sync-alt']}/></i>
       </Button>
       <Button
         className="btn btn-success btn-sm button-header-next"
-        onClick={showUploadModal}
-      >
-        <i className="fa fa-cloud-upload"></i>
+        onClick={showUploadModal}>
+        <i><FontAwesomeIcon icon={['fas', 'upload']}/></i>
       </Button>
       <Button
         className="btn btn-info btn-sm button-header-next"
         onClick={toggleLayout}
       >
-        <i
-          className={
-            "fa " +
-            (!layout || layout === "standard" ? "fa-expand" : "fa-compress")
-          }
-        ></i>
+        <i><FontAwesomeIcon icon={['fas',
+            (!layout || layout === "standard" ? "expand" : "compress")]}/></i>
       </Button>
     </div>
   </div>

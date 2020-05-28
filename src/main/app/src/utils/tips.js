@@ -32,7 +32,7 @@ const tips = [
 'Duplidate mocking things for alternative cases',
 'Share mocking things to another context',
 'Boring with your context, Jump to another one',
-'Hacking WhyMock? OK, I am fine!',
+'Hacking OpenAPI Mock? OK, I am fine!',
 ];
 
 /**

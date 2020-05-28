@@ -37,7 +37,13 @@ shareGroupStub,
 exportStub,
 exportGroup,
 } from '../actions';
-
+// Dependencies for icons within UI
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+library.add(
+  fas,
+)
 const ActionButton = ({
   selectedNode,
   edit,
@@ -66,8 +72,9 @@ const ActionButton = ({
           color: lightColors.white
         }}
         onClick={createStub}
-        icon="fa fa-plus"
-      />
+      >
+        <FontAwesomeIcon icon={['fas', 'plus']}/>
+      </Button>
       {edit && (
         <Button
           href="#"
@@ -77,29 +84,32 @@ const ActionButton = ({
             color: lightColors.white
           }}
           onClick={()=>duplicateStub(selectedNode.obj)}
-          icon="fa fa-copy"
-        />
+          >
+            <FontAwesomeIcon icon={['fas', 'copy']}/>
+          </Button>
       )}
       {hasDelete && (
         <Button
           href="#"
           tooltip="Delete stub"
           onClick={deleteStub}
-          icon="fa fa-trash"
-        />
+        >
+          <FontAwesomeIcon icon={['fas', 'trash']}/>
+        </Button>
       )}
       {edit && (
         <Button
           href="#"
           onClick={editStub}
           tooltip="Edit mapping"
-          icon="fa fa-pencil"
           styles={{
             backgroundColor: darkColors.teal,
             color: lightColors.white
           }}
           disabled={!edit}
-        />
+        >
+          <FontAwesomeIcon icon={['fas', 'edit']}/>
+        </Button>
       )}
       {disable && (
         <Button
@@ -110,8 +120,9 @@ const ActionButton = ({
             color: lightColors.green
           }}
           onClick={enableStub}
-          icon="fa fa-eye"
-        />
+        >
+          <FontAwesomeIcon icon={['fas', 'play-circle']}/>
+        </Button>
       )}
       {enable && (
         <Button
@@ -122,56 +133,61 @@ const ActionButton = ({
             color: lightColors.purple
           }}
           onClick={disableStub}
-          icon="fa fa-ban"
-        />
+        >
+          <FontAwesomeIcon icon={['fas', 'stop-circle']}/>
+        </Button>
       )}
       {hasDelete && (
         <Button
           href="#"
           tooltip="Share this stub to context"
           onClick={()=>shareStub(selectedNode.obj)}
-          icon="fa fa-share"
           styles={{
             backgroundColor: darkColors.cyan,
             color: lightColors.white
           }}
-        />
+        >
+          <FontAwesomeIcon icon={['fas', 'share-alt']}/>
+        </Button>
       )}
       {hasDelete && (
         <Button
           href="#"
           tooltip="Download the stub"
           onClick={exportStub}
-          icon="fa fa-cloud-download"
           styles={{
             backgroundColor: darkColors.cyan,
             color: lightColors.white
           }}
-        />
+        >
+          <FontAwesomeIcon icon={['fas', 'download']}/>
+        </Button>
       )}
       {isGroupSelected && (
         <Button
           href="#"
           tooltip="Download the group"
           onClick={exportGroup}
-          icon="fa fa-cloud-download"
           styles={{
             backgroundColor: darkColors.cyan,
             color: lightColors.white
           }}
-        />
+        >
+          <FontAwesomeIcon icon={['fas', 'download']}/>
+        </Button>
       )}
       {isGroupSelected && (
         <Button
           href="#"
           tooltip="Share group to context"
           onClick={()=>shareGroupStub(selectedNode)}
-          icon="fa fa-share-square-o"
           styles={{
             backgroundColor: darkColors.cyan,
             color: lightColors.white
           }}
-        />
+        >
+                  <FontAwesomeIcon icon={['fas', 'share-alt-square']}/>
+                </Button>
       )}
       <Button
         styles={{
@@ -179,10 +195,11 @@ const ActionButton = ({
           color: lightColors.green
         }}
         tooltip="What do you want?"
-        icon="fa fa-rocket"
         style={{ color: "green" }}
         rotate={true}
-      />
+      >
+        <FontAwesomeIcon icon={['fas', 'location-arrow']}/>
+      </Button>
     </Container>
   );
 };

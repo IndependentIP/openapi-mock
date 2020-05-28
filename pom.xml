@@ -1,3 +1,20 @@
+<!--
+
+    Copyright © 2020 FUGA (mark.schenk@fuga.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -5,7 +22,8 @@
     <groupId>org.fuga</groupId>
     <artifactId>openapi-mock</artifactId>
     <name>OpenAPI Mock</name>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
+    <inceptionYear>2020</inceptionYear>
     <packaging>jar</packaging>
 
     <organization>
@@ -28,11 +46,19 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
+        <frontend-src-dir>${project.basedir}/src/main/app</frontend-src-dir>
+
+        <!-- Version(s) maven plugins -->
+        <version.frontend-maven-plugin>1.10.0</version.frontend-maven-plugin>
+
+        <!-- Version(s) dependencies, etc -->
         <version.junit>3.8.1</version.junit>
         <version.logback>1.0.1</version.logback>
         <version.lombok>1.18.12</version.lombok>
+        <version.node>v12.3.1</version.node>
         <version.slf4j>1.6.4</version.slf4j>
         <version.swagger-parser>2.0.20</version.swagger-parser>
+        <version.yarn>v1.16.0</version.yarn>
         <version.wiremock>2.26.3</version.wiremock>
 
     </properties>
@@ -92,27 +118,96 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.0.0</version>
+                <version>3.0</version>
                 <configuration>
-                    <licenseName>apache_v2</licenseName>
-                    <inceptionYear>2020</inceptionYear>
-                    <organizationName>${project.organization.name}</organizationName>
-                    <projectName>${project.name}</projectName>
-                    <!--                    <roots>-->
-                    <!--                        <root>src/main/java</root>-->
-                    <!--                        <root>src/test</root>-->
-                    <!--                    </roots>-->
+                    <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+                    <properties>
+                        <owner>FUGA</owner>
+                        <email>mark.schenk@fuga.com</email>
+                    </properties>
+                    <excludes>
+                        <exclude>**/README</exclude>
+                        <exclude>src/test/resources/**</exclude>
+                        <exclude>src/main/resources/**</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
                         <id>update-license-headers</id>
                         <goals>
-                            <goal>update-file-header</goal>
-                            <goal>update-project-license</goal>
+                            <goal>format</goal>
                         </goals>
                         <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Plugin to build react app -->
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${version.frontend-maven-plugin}</version>
+
+                <configuration>
+                    <nodeVersion>${version.node}</nodeVersion>
+                    <yarnVersion>${version.yarn}</yarnVersion>
+                    <workingDirectory>${frontend-src-dir}</workingDirectory>
+                    <installDirectory>${project.build.directory}</installDirectory>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>install-frontend-tools</id>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>yarn-install</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>build-frontend</id>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <arguments>build ${project.build.directory}/ui</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Copy result of react build to proper location -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-output-react-build</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/ui/__files/app</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${frontend-src-dir}/build</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

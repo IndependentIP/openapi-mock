@@ -22,6 +22,14 @@ import { Alert } from "react-bootstrap";
 import { connect } from "react-redux";
 import {hideshareGroupStub,shareGroup} from '../actions';
 
+// Dependencies for icons within UI
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+library.add(
+  fas,
+)
+
 class GroupSharing extends React.Component {
   contextRef = createRef();
   newContextRef = createRef();
@@ -79,7 +87,7 @@ class GroupSharing extends React.Component {
                 variant="dark"
                 className="share-group-alert share-group-alert-separator"
               > to <br></br>
-                <i className="fa fa-arrow-right" />
+                <i><FontAwesomeIcon icon={['fas', 'arrow-right']}/></i>
               </Alert>
             </div>
             <div className="col-sm-5">

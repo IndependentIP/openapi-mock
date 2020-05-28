@@ -1,0 +1,473 @@
+/**
+ * Copyright © 2020 FUGA (mark.schenk@fuga.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.container , .container-fluid{
+  height: 100vh;
+  overflow: hidden;
+}
+.card{
+  border: none!important;
+}
+.dard-mode .input-group-text{
+  color:#adb5bd!important;
+  border: 1px #585858 solid;
+}
+.dard-mode .form-control{
+  background-color: #414141;
+  border-color: #505050!important;
+  color:#cecece!important;
+
+}
+.dard-mode .form-control:focus{
+  background-color: #cecece;
+  color: black!important;
+}
+.css-80f7ae{
+  padding-top: 2px;
+}
+.dard-mode .css-1cf7s5m,
+.dard-mode .css-80f7ae,
+.dard-mode .css-1cf7s5m a{
+  background-color: inherit!important;
+  color: rgba(225, 235, 245, 0.7)!important;
+  -webkit-font-smoothing: antialiased;
+}
+.dard-mode .card,
+.dard-mode .input-group-text{
+  background-color: #24344d!important;
+}
+.dard-mode .modal-footer
+{
+  border-top: none;
+}
+.dard-mode .tree-view .tree-view-content,
+.dard-mode .tree-view .tree-view-content .css-f91fgu,
+.dard-mode .css-79elbk,
+.dard-mode .css-1s1o8u8
+{
+  color: rgba(225,235,245,.95)!important;
+  background-color: #131c29!important;
+
+}
+div.css-26l3qy, .css-26l3qy-menu {
+  z-index: 40;
+}
+.dard-mode,.dard-mode .container,.dard-mode .tree-view,
+
+
+.dard-mode .footer,
+.dard-mode .css-26l3qy-menu,
+.dard-mode .modal-header,
+.dard-mode button.close,
+.dard-mode .modal-body,
+.dard-mode .modal-footer
+{
+  color: white!important;
+  background-color: #222!important;
+}
+.dard-mode .breadcrumb,
+.dard-mode .breadcrumb-item
+{
+background-color: #444;
+color:#999!important;
+}
+
+.dard-mode .css-yk16xz-control{
+  background-color:#25344d;
+  border-color: #324462;
+
+}
+.dard-mode  .css-yk16xz-control:hover {
+  border-color: #324462;
+}
+.dard-mode .css-1pahdxg-control{
+  background-color: #25344d;
+
+}
+.dard-mode .css-26l3qy-menu .css-1n7v3ny-option{
+  background-color: #017bfe;
+  color: rgba(225, 235, 245, 1)!important;
+
+}
+.dard-mode .css-yt9ioa-option{
+  color: rgba(225, 235, 245, 0.7)!important;
+
+}
+.dard-mode .css-1uccc91-singleValue{
+  color: rgba(225, 235, 245, 0.7)!important;
+}
+.dard-mode .border-right,.dard-mode .container,
+.dard-mode .table th,.dard-mode .table td{
+  border: none!important;
+  border-left: none!important;
+  border-right: none!important;
+}
+.dard-mode .view-panel a{
+  color:#999!important;
+}
+.dard-mode .block-area{
+  background-color: #24344d!important;
+  border-color: #0e131f;
+}
+.dard-mode .block-area-response .breadcrumb{
+margin-bottom: 4px;
+}
+.dard-mode .table{
+  background-color: #24344d!important;
+  color: rgba(225, 235, 245, 0.7)!important;
+
+}
+.App {
+  text-align: center;
+ 
+}
+.container{
+  background-color: white;
+}
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.tree-view,.tree-view ul{
+    height: 100%;
+}
+.tree-view{
+  height: 100%;
+}
+.border-right{
+  border-right: 1px solid rgba(222, 226, 230, 0.23) !important;
+  background-color: white;
+  
+}
+.container{
+  border-left: 1px solid rgba(222, 226, 230, 0.23) !important;
+  border-right: 1px solid rgba(222, 226, 230, 0.23) !important;
+}
+.containerWrapper{
+  height: 100%;
+}
+.dard-mode .view-panel{
+ background-color: #0d141f!important;
+}
+.header{
+}
+.tree-view-content{
+  background-color: white;
+  max-height: 94vh;
+  overflow: auto;
+
+}
+.tree-view-content ul,.tree-view-content li{
+  background-color: white!important;
+}
+.tree-view-content div{
+  color:#3a3535;
+}
+.tree-view-content a, .view-panel a{
+  color: black;
+  text-decoration: none;
+}
+/* .group-icon{
+  width: 20px;
+  opacity: 0.2;
+} */
+.header-row{
+  background-color: #263248;
+  padding: 10px;
+}
+.light-mode .header-row{
+  box-shadow: 8px 8px 16px #d1cbcb, -8px -8px 16px #ffffff;
+}
+span.method-badge{
+  margin-right: 7px;
+}
+
+.fullHeight{
+  height: 100%;
+}
+/* .react-json-view{
+  height: 66vh ;
+  overflow: auto;
+} */
+
+.block-area-response .scrollbar-container{
+  max-height: 69vh ;
+}
+
+.not-available{
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
+  line-height: 20;
+  font-size: 25px;
+  color: #dee2e6!important;
+}
+.inputLabel{
+  width:120px;
+}
+h3{
+  color:gray;
+}
+.header-img img{
+  width: 80px ;
+}
+.tree-item-disabled{
+  color:gray;
+}
+.suggestion-list{
+  width:200px;
+}
+.suggestion-list .css-2b097c-container{
+  width:100%;
+}
+.suggestion-list .css-1hwfws3{
+height:42px;
+}
+.suggestionZone{
+  height: 40px;
+}
+.suggestionZone li{
+  border-radius: 100px;
+  color: gray;
+  padding-left: 18px;
+}
+.block-area{
+  border: 1px solid #dee2e6;
+  margin-top:20px;
+}
+.field-group-with-complete input{
+height:44px;
+}
+.field-group-with-complete ul{
+  padding: 0px;
+  }
+
+.fab-container {
+  position: fixed!important;
+  right: 25vw!important;
+  bottom: 20vh!important;
+
+}
+.container-fluid .fab-container {
+  position: fixed!important;
+  right: 6vw!important;
+  bottom: 20vh!important;
+
+}
+.sc-htpNat{
+  max-height: 400px;
+}
+.css-79elbk{
+  font-size: 16px!important;
+}
+.footer{
+  background-color: #e9ecef;
+  border:0px;
+}
+.right-toolbar{
+  text-align: right;
+}
+
+.dard-mode #react-select-2-input{
+  color:rgba(225, 235, 245, 0.7)!important;
+}
+.button-header{
+  margin-left: 9px;
+  margin-top: 5px;
+}
+.setting-modal h3{
+  font-size: 1rem;
+}
+.setting-modal .row{
+  margin-top: 10px;
+}
+.vertical-middle{
+  padding-top:7px;
+  padding-left:0px!important;
+}
+.right-align{
+  position: absolute;
+  right: 25px;
+}
+
+.stamp {
+  position: absolute;
+  right: 20px;
+  transform: rotate(12deg);
+	color: #55555547;
+	font-size: 1.5rem;
+	font-weight: 700;
+	border: 0.25rem solid #55555547;
+	display: inline-block;
+	padding: 0.25rem 1rem;
+	text-transform: uppercase;
+	border-radius: 1rem;
+	font-family: 'Courier';
+	-webkit-mask-image: url('../public/grunge.png');
+  -webkit-mask-size: 944px 604px;
+  mix-blend-mode: multiply;
+}
+.is-nope {
+	-webkit-mask-position: 2rem 3rem;
+}
+
+.tree-button-bar{
+  margin-left: 4px;
+  padding-top: 8px;
+  color: #0096884f;
+}
+.share-group-alert{
+  text-align: center;
+  font-size: large;
+  height: 90px;
+  vertical-align: middle;
+}
+
+.dard-mode textarea{
+  width: 100%;
+  height: 200px;
+  background-color: #1e1e1e;
+  color: #cecece!important;
+  padding: 10px;
+  border: none;
+}
+.light-mode textarea{
+  width: 100%;
+  height: 200px;
+  padding: 10px;
+  border: 1px solid #d1cbcb;
+  box-shadow:  8px 8px 16px #d1cbcb, 
+               -8px -8px 16px #ffffff;
+}
+.light-mode{
+  background: #efeeee;
+}
+.light-mode .container{
+  box-shadow: 8px 8px 16px #d1cbcb, -8px 12px 16px #ffffff;
+}
+.block-area{
+  border-radius: 6px;
+}
+.block-area nav ol{
+  border-radius: 6px 6px 0 0;
+}
+
+.light-mode .block-area{
+  box-shadow:  8px 8px 16px #d1cbcb, 
+               -8px -8px 16px #ffffff;
+}
+.block-area-2{
+  margin-top: 0px;
+}
+span .badge, button {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-sizing: border-box;
+}
+
+.light-mode .scrollbar-container, .light-mode .view-panel{
+  margin-top: 22px;
+  padding-left: 8px;
+  box-shadow:  8px 8px 16px #d1cbcb, 
+               -8px 12px 16px #ffffff;}
+
+.button-header-2{
+  color: white;
+  margin-top: 5px;
+  cursor: pointer;
+  margin-left: 20px;
+
+}
+.button-header-next{
+  color: white;
+  margin-top: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+
+}
+@keyframes fadein {
+  from { opacity: 0;}
+  to   { opacity: 1; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.uploadStub .json{
+  height: 300px;
+}
+
+.tree-menu-item{
+  position: absolute;
+  padding: 0;
+  right: 20px;
+  top:5px;
+  z-index: 20;
+  color: #627280!important;
+}
+.tree-menu-item i {
+  transition: all .6s cubic-bezier(0.165, 0.84, 0.44, 1);
+
+}
+.tree-menu-item i:hover{
+  transform: scale(1.35, 1.35);
+}
+
+.tree-menu-item-2{
+  right: 40px;
+}
+
+.tree-menu-item-3{
+  right: 60px;
+}

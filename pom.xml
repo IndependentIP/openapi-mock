@@ -131,7 +131,7 @@
                         <exclude>**/README</exclude>
                         <exclude>src/test/resources/**</exclude>
                         <exclude>src/main/resources/**</exclude>
-                        <exclude>src/main/app/node_modules</exclude>
+                        <exclude>src/main/app/node_modules/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -228,7 +228,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>org.fuga.mock.OpenApiMock</Main-Class>
+                                        <Main-Class>org.fuga.mock.OpenApiMockServer</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

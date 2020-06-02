@@ -15,8 +15,8 @@
  */
 import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
-import ReactJson from "react-json-view";
-import PerfectScrollbar from "react-perfect-scrollbar";
+//import ReactJson from "react-json-view";
+//import PerfectScrollbar from "react-perfect-scrollbar";
 import _ from "lodash";
 
 import { connect } from "react-redux";
@@ -40,7 +40,7 @@ const UploadStub = ({
 
   const onFileLoad = event => {
     const content = event.target.result;
-    setData({ rawData: JSON.parse(content) });
+    setData({ rawData: content });
   };
   const onChooseFile = (event, onLoadFileHandler) => {
     if (typeof window.FileReader !== "function")
@@ -50,6 +50,7 @@ const UploadStub = ({
       throw "The browser does not properly implement the event object";
     if (!input.files)
       throw "This browser does not support the `files` property of the file input.";
+
     if (!input.files[0]) return undefined;
     let file = input.files[0];
     let fr = new FileReader();
@@ -57,78 +58,14 @@ const UploadStub = ({
     fr.readAsText(file);
   };
 
-  const replaceAll = (str, find, replace) => {
-    return str.replace(new RegExp(find, "g"), replace);
-  };
-  const removeContextFromUrl = (context, url) => {
-    if (context) {
-      //replace special / by another fake string
-      const fakeString = "-XUX-";
-      url = replaceAll(url, "/", fakeString);
-      url = fakeString + url.replace(fakeString + context + fakeString, "");
-      url = replaceAll(url, fakeString, "/");
-    }
-    return url;
-  };
 
-  const map = d => {
-    if (!d.request) {
-      return undefined;
-    }
-    const data = {
-      ...d,
-      id: undefined,
-      uuid: undefined,
-      response: { ...d.response, body: JSON.stringify(d.response.body) }
-    };
-
-    if (context) {
-      //the url should be apply the context
-      data.request = {
-        ...data.request,
-        urlPattern:
-          "/" +
-          context +
-          removeContextFromUrl(
-            _.get(data, "metadata.context", undefined),
-            data.request.urlPattern
-          )
-      };
-    } else {
-      //the url should be apply the context
-      data.request = {
-        ...data.request,
-        urlPattern: removeContextFromUrl(
-          _.get(data, "metadata.context", undefined),
-          data.request.urlPattern
-        )
-      };
-    }
-    data.metadata = { ...d.metadata, context: context ? context : undefined };
-    return data;
-  };
   const handleSave = () => {
     let sendData = [];
-
-    if (_.isArray(data.rawData)) {
-      sendData = data.rawData.filter(d => d.request).map(d => map(d));
-    } else {
-      const postedData = map(data.rawData);
-      if (postedData) {
-        postedData.response.body = JSON.stringify(postedData.response.body);
-        sendData.push(postedData);
-      }
+    if(data.rawData===0){
+        console.log("No data to send");
+        return;
     }
-if(sendData.length===0){
-  return;
-}
-    importStub({
-      mappings: sendData,
-      importOptions: {
-        duplicatePolicy: "IGNORE",
-        deleteAllNotInImport: false
-      }
-    });
+    importStub(data.rawData);
   };
   const modeClass = mode === "dard" ? "dard-mode" : "light-mode";
 
@@ -152,7 +89,7 @@ if(sendData.length===0){
         <br></br>
         <br></br>
         <input
-          accept=".json"
+          accept=".yaml"
           type="file"
           onChange={event =>
             onChooseFile(event, (elementId, event) =>
@@ -162,17 +99,6 @@ if(sendData.length===0){
         />
         <br></br>
         <br></br>
-        <div className="json">
-          <PerfectScrollbar>
-            <ReactJson
-              theme={theme}
-              id="a_unique_id"
-              displayDataTypes={false}
-              className="react-json-view"
-              src={data.rawData}
-            />
-          </PerfectScrollbar>
-        </div>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>

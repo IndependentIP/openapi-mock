@@ -16,25 +16,24 @@
 package org.fuga.mock;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.admin.tasks.GetAllStubMappingsTask;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
-import com.github.tomakehurst.wiremock.common.Metadata;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
+import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
-import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import lombok.extern.slf4j.Slf4j;
 import wiremock.org.apache.http.HttpStatus;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -43,16 +42,14 @@ import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.common.Metadata.metadata;
-import static com.github.tomakehurst.wiremock.core.WireMockApp.MAPPINGS_ROOT;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static wiremock.org.apache.commons.lang3.math.NumberUtils.isParsable;
 
 /**
  * Mock Server based on Swagger specification
  */
 @Slf4j
-public class OpenApiMock {
+public class OpenApiMockServer {
 
     public static final String EXPECTED_EXAMPLE = "expected-example";
     public static final String EXPECTED_RESPONSE = "expected-response";
@@ -62,88 +59,62 @@ public class OpenApiMock {
      */
     private final WireMockServer wireMockServer;
 
+    private static OpenApiMockServer openApiMockServer = null;
+
+    public static final OpenApiMockServer getInstance() {
+        if (openApiMockServer == null) {
+            openApiMockServer = new OpenApiMockServer();
+        }
+
+        return openApiMockServer;
+    }
+
     public static void main(String[] args) {
         // TODO: properly parse input arguments
-        new OpenApiMock("cfg", 5868);
+        getInstance().loadSpecifications("cfg");
+
     }
 
     /**
      * Default constructor for testing purposes only
      */
-    OpenApiMock() {
+    OpenApiMockServer() {
         this(80);
     }
 
     /**
      * Creates instance of MockServer listening on speficied port
      */
-    public OpenApiMock(int port) {
+    private OpenApiMockServer(int port) {
         log.info("Starting MockServer listening on port {}", port);
-//        wireMockServer = new WireMockServer(
-//                wireMockConfig()
-//                        .port(port)
-//                        .notifier(new Slf4jNotifier(true))
-//                        .extensions(ExpectedExtension.class)
-//                        .usingFilesUnderClasspath("/ui")
-//                        .mappingSource(new CustomMappingSource(filesRoot().child(MAPPINGS_ROOT))));
-        //.usingFilesUnderDirectory("./wiremock"));
-        WireMockConfiguration option = options();
-        option.port(port);
-        option.usingFilesUnderClasspath("ui");
-        option.extensions(ExpectedExtension.class);
-        //option.mappingSource(new CustomMappingSource(option.filesRoot().child(MAPPINGS_ROOT)));
-        wireMockServer = new WireMockServer(option);
-
+        wireMockServer = new WireMockServer(
+                wireMockConfig()
+                        .port(port)
+                        .notifier(new Slf4jNotifier(true))
+                        .extensions(ExpectedExtension.class)
+                        .extensions(new ImportOpenApiExtension(this))
+                        .usingFilesUnderClasspath("ui"));
         wireMockServer.start();
-    }
-
-    /**
-     * Constructor Mock Server
-     *
-     * @param swaggerFolder
-     *         Package that need to be scanned for annotated classes
-     * @param port
-     *         Port on which mock server will be reachable.
-     */
-    public OpenApiMock(String swaggerFolder, int port) {
-        this(port);
-
-        // Create Swagger stubs
-        loadSpecifications(swaggerFolder);
-    }
-
-    /**
-     * Gracefully shutdown the server.
-     * <p>
-     * This method assumes it is being called as the result of an incoming HTTP
-     * request.
-     */
-    public void shutdown() {
-        log.info("Shutdown mock server");
-        wireMockServer.shutdown();
     }
 
     private void loadSpecifications(String swaggerFolder) {
         log.info("Create swagger model from yaml files in  {}", swaggerFolder);
 
-        // Remove any previously defined stubs
-        //reset();
-
         File folder = new File(swaggerFolder);
         if (folder.isDirectory()) {
-            Arrays.stream(folder.listFiles()).forEach(apiDefiniiton -> {
-                if (isYamlFile(apiDefiniiton)) {
-                    createMocks(apiDefiniiton.getAbsolutePath());
+            Arrays.stream(folder.listFiles()).forEach(apiDefinition -> {
+                if (isYamlFile(apiDefinition)) {
+                    createMocksFromFile(apiDefinition.toURI());
                 }
             });
         }
     }
 
-    private void createMocks(final String swaggerPath) {
-        OpenAPI swaggerObject = new OpenAPIV3Parser().read(swaggerPath);
+    private void createMocksFromFile(final URI swaggerLocation) {
+        SwaggerParseResult parseResult = new OpenAPIParser().readLocation(swaggerLocation.toString(),null,null);
 
-        if (swaggerObject != null) {
-            createMocks(swaggerObject);
+        if (parseResult.getOpenAPI() != null) {
+            createMocks(parseResult.getOpenAPI());
         }
     }
 
@@ -153,21 +124,12 @@ public class OpenApiMock {
     }
 
     /**
-     * Reset mock server removing all previously defined stubs
-     */
-    public void reset() {
-        wireMockServer.resetMappings();
-        wireMockServer.resetRequests();
-        wireMockServer.resetScenarios();
-    }
-
-    /**
      * Stub the operations as specified within specification.
      *
      * @param specification
      *         Swagger specification
      */
-    private void createMocks(OpenAPI specification) {
+    void createMocks(OpenAPI specification) {
 
         // Create for each defined server mocks
         specification.getServers().forEach(server -> {
@@ -230,7 +192,7 @@ public class OpenApiMock {
         }
 
         stub.withName(operation.getOperationId());
-        stub.withMetadata(metadata().attr("file_name","open-api").build());
+        stub.withMetadata(metadata().attr("file_name", "open-api").build());
         return stub;
     }
 
@@ -386,3 +348,4 @@ public class OpenApiMock {
     }
 
 }
+

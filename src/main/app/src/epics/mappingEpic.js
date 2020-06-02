@@ -188,7 +188,7 @@ const importStubsSuccessEpic = (action$) =>
   action$.pipe(
     ofType(IMPORT_STUB_SUCCESS),
     mergeMap(() => {
-      return of(hideuploadStub(), resetMapping());
+      return of(hideuploadStub(),loadAllMappings());
     })
   );
 

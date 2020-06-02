@@ -15,24 +15,21 @@
  */
 package org.fuga.mock;
 
-import com.github.tomakehurst.wiremock.admin.AdminTask;
 import com.github.tomakehurst.wiremock.admin.Router;
-import com.github.tomakehurst.wiremock.admin.model.PathParams;
-import com.github.tomakehurst.wiremock.core.Admin;
 import com.github.tomakehurst.wiremock.extension.AdminApiExtension;
 import com.github.tomakehurst.wiremock.http.QueryParameter;
-import com.github.tomakehurst.wiremock.http.Request;
-import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import lombok.extern.slf4j.Slf4j;
 import wiremock.org.apache.http.HttpStatus;
 
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static com.github.tomakehurst.wiremock.http.RequestMethod.*;
 import static wiremock.org.apache.commons.lang3.math.NumberUtils.isParsable;
 
+/**
+ * Extension of WireMock to define expected response for OpenApi
+ */
 @Slf4j
 public class ExpectedExtension implements AdminApiExtension {
 
@@ -54,72 +51,63 @@ public class ExpectedExtension implements AdminApiExtension {
     @Override
     public void contributeAdminApiRoutes(Router router) {
         // Define expected response/example
-        router.add(PUT, EXPECTED_PATH, new AdminTask() {
-                    @Override
-                    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-                        String name = pathParams.get(ENDPOINT_NAME);
+        router.add(PUT, EXPECTED_PATH, (admin, request, pathParams) -> {
+            String name = pathParams.get(ENDPOINT_NAME);
 
-                        QueryParameter expectedResponse = request.queryParameter("response");
-                        if (expectedResponse.isPresent()) {
-                            log.debug("Defining expected response for {}", name);
-                            if (isParsable(expectedResponse.firstValue())) {
-                                expected.put(name, Integer.valueOf(expectedResponse.firstValue()));
-                                return responseDefinition()
-                                        .withStatus(HttpStatus.SC_OK)
-                                        .withBody("Succefully added expected respose '" + expectedResponse.firstValue() + "' for " + name)
-                                        .build();
-                            } else {
-                                return responseDefinition()
-                                        .withStatus(HttpStatus.SC_BAD_REQUEST)
-                                        .withBody("response must contain valid HTTP Status")
-                                        .build();
-                            }
-                        } else {
-                            return responseDefinition()
-                                    .withStatus(HttpStatus.SC_BAD_REQUEST)
-                                    .withBody("Request must contain parameter 'response'")
-                                    .build();
-                        }
-                    }
-                }
-        );
-
-        // Return expected response/example
-        router.add(GET, EXPECTED_PATH, new AdminTask() {
-            @Override
-            public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-                String name = pathParams.get(ENDPOINT_NAME);
-                if (expected.containsKey(name)) {
+            QueryParameter expectedResponse = request.queryParameter("response");
+            if (expectedResponse.isPresent()) {
+                log.debug("Defining expected response for {}", name);
+                if (isParsable(expectedResponse.firstValue())) {
+                    expected.put(name, Integer.valueOf(expectedResponse.firstValue()));
                     return responseDefinition()
                             .withStatus(HttpStatus.SC_OK)
-                            .withBody("expecting response with http status " + expected.get(name))
+                            .withBody("Succefully added expected respose '" + expectedResponse.firstValue() + "' for " + name)
                             .build();
                 } else {
                     return responseDefinition()
-                            .withStatus(HttpStatus.SC_NOT_FOUND)
-                            .withBody("No expectation defined for '" + name + "'")
+                            .withStatus(HttpStatus.SC_BAD_REQUEST)
+                            .withBody("response must contain valid HTTP Status")
                             .build();
                 }
+            } else {
+                return responseDefinition()
+                        .withStatus(HttpStatus.SC_BAD_REQUEST)
+                        .withBody("Request must contain parameter 'response'")
+                        .build();
+            }
+        }
+        );
+
+        // Return expected response/example
+        router.add(GET, EXPECTED_PATH, (admin, request, pathParams) -> {
+            String name = pathParams.get(ENDPOINT_NAME);
+            if (expected.containsKey(name)) {
+                return responseDefinition()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody("expecting response with http status " + expected.get(name))
+                        .build();
+            } else {
+                return responseDefinition()
+                        .withStatus(HttpStatus.SC_NOT_FOUND)
+                        .withBody("No expectation defined for '" + name + "'")
+                        .build();
             }
         });
 
         // Remove expected response/example
-        router.add(DELETE, EXPECTED_PATH, new AdminTask() {
-            @Override
-            public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-                String name = pathParams.get(ENDPOINT_NAME);
-                if (expected.containsKey(name)) {
-                    int expectedResponse = expected.remove(name);
-                    return responseDefinition()
-                            .withStatus(HttpStatus.SC_OK)
-                            .withBody("removed expected response " + expected.get(name) + " for " + name + ", now returning default response")
-                            .build();
-                } else {
-                    return responseDefinition()
-                            .withStatus(HttpStatus.SC_NOT_FOUND)
-                            .withBody("No expectation defined for '" + name + "'")
-                            .build();
-                }
+        router.add(DELETE, EXPECTED_PATH, (admin, request, pathParams) -> {
+            String name = pathParams.get(ENDPOINT_NAME);
+            if (expected.containsKey(name)) {
+                int expectedResponse = expected.remove(name);
+                return responseDefinition()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withBody("removed expected response " + expectedResponse + " for " + name + ", now returning default response")
+                        .build();
+            } else {
+                return responseDefinition()
+                        .withStatus(HttpStatus.SC_NOT_FOUND)
+                        .withBody("No expectation defined for '" + name + "'")
+                        .build();
             }
         });
 

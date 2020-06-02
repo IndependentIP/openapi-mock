@@ -53,7 +53,7 @@ export const $resetMapping = () => {
 
 };
 export const importStub = (stubs, callback) => {
-  fetch(WMurl + "/__admin/mappings/import", {
+  fetch(WMurl + "/__admin/mappings/import/openapi/", {
     method: "POST",
     body: JSON.stringify(stubs)
   }).then(response => {
@@ -62,7 +62,7 @@ export const importStub = (stubs, callback) => {
 };
 
 export const $importStub = (stubs) => {
-  return Axios.post(WMurl + "/__admin/mappings/import", stubs);
+  return Axios.post(WMurl + "/__admin/mappings/import/openapi/", stubs);
 };
 
 export const createStub = data => {

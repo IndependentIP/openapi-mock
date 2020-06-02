@@ -32,7 +32,7 @@ class About extends React.Component {
         <Modal.Body>
           <div className="row">
             <div className="col-sm-12 css-80f7ae">
-              <h3>WhyMock version 3.0</h3>
+              <h3>OpenAPI Mock</h3>
               <p>End-to-End application with all features: add, edit, delete, search all mocking stubs. Included:</p>
               <p>* Administrator GUI embeded: dark mode enable, customize settings.</p>
               <p>* Real-time search, add, edit, delete, duplicate, diable mocking stubs.</p>

@@ -156,7 +156,7 @@ class WhyMock extends PureComponent {
               showAboutModal={this.props.showAboutModal}
               showContextModal={this.props.showContextModal}
               context={context}
-              refreshStubs={this.props.resetMapping}
+              resetMocks={this.props.resetMapping}
               toggleLayout={this.props.toggleLayout}
               layout={layout}
               showUploadModal={this.props.uploadStub}
@@ -201,7 +201,7 @@ const Header = ({
   showSettingModal,
   showAboutModal,
   showContextModal,
-  refreshStubs,
+  resetMocks,
   toggleLayout,
   layout,
   showUploadModal
@@ -223,11 +223,11 @@ const Header = ({
         <Dropdown.Item href="#/action-1" onClick={showContextModal}>
           <i><FontAwesomeIcon icon={['fas', 'rocket']}/></i> Change context
         </Dropdown.Item>
-        <Dropdown.Item href="#/action-1" onClick={refreshStubs}>
-          <i><FontAwesomeIcon icon={['fas', 'sync-alt']}/></i> Refresh
+        <Dropdown.Item href="#/action-1" onClick={resetMocks}>
+          <i><FontAwesomeIcon icon={['fas', 'eraser']}/></i> Reset
         </Dropdown.Item>
         <Dropdown.Item href="#/action-1" onClick={showUploadModal}>
-          <i><FontAwesomeIcon icon={['fas', 'upload']}/></i> Upload stubs
+          <i><FontAwesomeIcon icon={['fas', 'upload']}/></i> Upload mocks
         </Dropdown.Item>
         <Dropdown.Item href="#/action-2" onClick={showSettingModal}>
           <i><FontAwesomeIcon icon={['fas', 'cog']}/></i> Setting
@@ -237,11 +237,6 @@ const Header = ({
           <i><FontAwesomeIcon icon={['fas', 'info-circle']}/></i> About
         </Dropdown.Item>
       </SplitButton>
-      <Button
-        className="btn btn-success btn-sm button-header-2"
-        onClick={refreshStubs}>
-        <i><FontAwesomeIcon icon={['fas', 'sync-alt']}/></i>
-      </Button>
       <Button
         className="btn btn-success btn-sm button-header-next"
         onClick={showUploadModal}>

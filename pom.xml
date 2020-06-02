@@ -131,6 +131,7 @@
                         <exclude>**/README</exclude>
                         <exclude>src/test/resources/**</exclude>
                         <exclude>src/main/resources/**</exclude>
+                        <exclude>src/main/app/node_modules</exclude>
                     </excludes>
                 </configuration>
                 <executions>

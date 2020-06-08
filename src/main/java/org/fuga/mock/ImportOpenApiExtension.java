@@ -18,7 +18,6 @@ package org.fuga.mock;
 import com.github.tomakehurst.wiremock.admin.Router;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.core.Admin;
-import com.github.tomakehurst.wiremock.core.WireMockApp;
 import com.github.tomakehurst.wiremock.extension.AdminApiExtension;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import io.swagger.parser.OpenAPIParser;
@@ -30,6 +29,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import wiremock.org.apache.http.HttpStatus;
 
@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.common.Metadata.metadata;
 import static com.github.tomakehurst.wiremock.http.RequestMethod.POST;
 import static wiremock.org.apache.commons.lang3.math.NumberUtils.isParsable;
@@ -50,16 +49,14 @@ import static wiremock.org.apache.commons.lang3.math.NumberUtils.isParsable;
 @Slf4j
 public class ImportOpenApiExtension implements AdminApiExtension {
 
-    public static final String EXPECTED_EXAMPLE = "expected-example";
-    public static final String EXPECTED_RESPONSE = "expected-response";
+    private static final String UNKNOWN = "unknown";
+    private static final String EXPECTED_EXAMPLE = "expected-example";
+    private static final String EXPECTED_RESPONSE = "expected-response";
 
 
-    private final String IMPORT_OPENAPI_PATH = "/mappings/import/openapi/";
+    private static final String IMPORT_OPENAPI_PATH = "/mappings/import/openapi/";
 
-    private final OpenApiMockServer mockServer;
-
-    ImportOpenApiExtension(final OpenApiMockServer mockServer) {
-        this.mockServer = mockServer;
+    ImportOpenApiExtension() {
     }
 
     /**
@@ -115,7 +112,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
      * @param specification
      *         Swagger specification
      */
-    void createMocks(Admin admin, OpenAPI specification) {
+    void createMocks(@NonNull Admin admin, @NonNull OpenAPI specification) {
 
         // Create for each defined server mocks
         specification.getServers().forEach(server -> {
@@ -124,10 +121,11 @@ public class ImportOpenApiExtension implements AdminApiExtension {
             try {
                 String basePath = new URI(server.getUrl()).getPath();
                 log.debug("Extracted basepath is {}", basePath);
+
                 toStream(specification.getPaths()).forEach(paths -> {
                     final String path = basePath + paths.getKey();
                     log.info("Creating mock(s) for path {}", path);
-                    createMock(admin, path, paths.getValue());
+                    createMock(admin, createCategory(specification), path, paths.getValue());
                 });
             } catch (URISyntaxException error) {
                 log.error("Unable to retrieve basepath from url " + server.getUrl(), error);
@@ -136,11 +134,21 @@ public class ImportOpenApiExtension implements AdminApiExtension {
 
     }
 
-    private void createMock(final Admin admin, final String url, final PathItem path) {
-        mockOperation(admin, PathItem.HttpMethod.GET, url, path.getGet());
-        mockOperation(admin, PathItem.HttpMethod.PUT, url, path.getPut());
-        mockOperation(admin, PathItem.HttpMethod.POST, url, path.getPost());
-        mockOperation(admin, PathItem.HttpMethod.DELETE, url, path.getDelete());
+    private String createCategory(OpenAPI specification) {
+        String title = UNKNOWN;
+        String version = UNKNOWN;
+        if (specification.getInfo() != null) {
+            title = Optional.ofNullable(specification.getInfo().getTitle()).orElse(UNKNOWN);
+            version = Optional.ofNullable(specification.getInfo().getVersion()).orElse(UNKNOWN);
+        }
+        return title + ":" +version;
+    }
+
+    private void createMock(final Admin admin, final String category, final String url, final PathItem path) {
+        mockOperation(admin, category, PathItem.HttpMethod.GET, url, path.getGet());
+        mockOperation(admin, category, PathItem.HttpMethod.PUT, url, path.getPut());
+        mockOperation(admin, category, PathItem.HttpMethod.POST, url, path.getPost());
+        mockOperation(admin, category, PathItem.HttpMethod.DELETE, url, path.getDelete());
     }
 
     /**
@@ -174,11 +182,10 @@ public class ImportOpenApiExtension implements AdminApiExtension {
 
             default:
                 log.warn("[{}]:{} is not supported yet", method, url);
-                throw new Error("Unsupported HTTP Method");
+                throw new UnsupportedOperationException("Unsupported HTTP Method");
         }
 
         stub.withName(operation.getOperationId());
-        stub.withMetadata(metadata().attr("file_name", "open-api").build());
         return stub;
     }
 
@@ -210,18 +217,19 @@ public class ImportOpenApiExtension implements AdminApiExtension {
             String mediaType,
             String exampleKey,
             String example) {
-        final MappingBuilder stub = createMockWithQueryParameters(method, url, operation);
+        final MappingBuilder mock = createMockWithQueryParameters(method, url, operation);
+
 
         log.debug("Adding examples {}", exampleKey);
         if (!"default".equalsIgnoreCase(exampleKey)) {
             // In case not default response example expected-example header must match
-            stub.andMatching(value -> MatchResult.of(exampleKey.equalsIgnoreCase(value.getHeader(EXPECTED_EXAMPLE)))
+            mock.andMatching(value -> MatchResult.of(exampleKey.equalsIgnoreCase(value.getHeader(EXPECTED_EXAMPLE)))
             );
         }
 
         if (responseStatus != 200) {
             // In case example not response for success expected-response header or defined expectation must match
-            stub.andMatching(value -> {
+            mock.andMatching(value -> {
                         String expectedResponseStatus = value.getHeader(EXPECTED_RESPONSE);
 
                         if (expectedResponseStatus == null) {
@@ -232,21 +240,22 @@ public class ImportOpenApiExtension implements AdminApiExtension {
             );
         }
 
-        stub.willReturn(aResponse()
+        mock.willReturn(aResponse()
                 .withStatus(responseStatus)
                 .withHeader("Content-Type", mediaType)
                 .withHeader("Cache-Control", "no-cache")
                 .withBody(example));
 
-        return stub;
+        return mock;
     }
 
     /**
      * Creates default response for requests without mandatory parameters or
      * missing headers.
      */
-    private void createResponseBadRequest(final Admin admin, PathItem.HttpMethod method, String url,
+    private Optional<MappingBuilder> createResponseBadRequest(PathItem.HttpMethod method, String url,
                                           Operation operation) {
+
         if ((operation != null) && hasMandatoryQueryParameters(operation)) {
 
             log.info("Creating default response for bad request [{}]:{}",
@@ -263,8 +272,10 @@ public class ImportOpenApiExtension implements AdminApiExtension {
                                     "Invalid Request, missing mandatory parameter or header"))
                     .atPriority(Integer.MAX_VALUE);
 
-            admin.addStubMapping(stub.build());
+            return Optional.of(stub);
         }
+
+        return Optional.empty();
     }
 
     /**
@@ -282,10 +293,15 @@ public class ImportOpenApiExtension implements AdminApiExtension {
         return false;
     }
 
-    private void mockOperation(final Admin admin, final PathItem.HttpMethod method, final String url, final Operation operation) {
+    private void mockOperation(final Admin admin, final String category, final PathItem.HttpMethod method, final String url, final Operation operation) {
         if (operation != null) {
             // Create response for bad request (e,g, missing required query parameter)
-            createResponseBadRequest(admin, method, url, operation);
+            Optional<MappingBuilder> mock = createResponseBadRequest(method, url, operation);
+            mock.ifPresent(mapping -> {
+                mapping.withMetadata(metadata().attr("specification", category).build());
+                admin.addStubMapping(mapping.build());
+            });
+
 
             toStream(operation.getResponses()).forEach(responseDef -> {
                 if (isParsable(responseDef.getKey())) {
@@ -298,14 +314,17 @@ public class ImportOpenApiExtension implements AdminApiExtension {
 
                         toStream(mediaType.getExamples()).forEach(exampleDef -> {
                             // Will create response which will be returned if expected_example header is specified
+                            MappingBuilder mapping = createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), exampleDef.getKey(), exampleDef.getValue().toString());
+                            mapping.withMetadata(metadata().attr("specification", category).build());
                             admin.addStubMapping(
-                                    createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), exampleDef.getKey(), exampleDef.getValue().toString()).build());
+                                    mapping.build());
                         });
 
                         Optional.ofNullable(mediaType.getExample()).ifPresent(example -> {
                             // Will create response that is always returned
-                            admin.addStubMapping(
-                                    createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), "default", example.toString()).build());
+                            MappingBuilder mapping = createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), "default", example.toString());
+                            mapping.withMetadata(metadata().attr("specification", category).build());
+                            admin.addStubMapping(mapping.build());
                         });
                     });
                 } else {

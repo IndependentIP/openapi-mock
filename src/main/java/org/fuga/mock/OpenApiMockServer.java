@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
@@ -76,18 +77,11 @@ public class OpenApiMockServer {
     }
 
     /**
-     * Default constructor for testing purposes only
-     */
-    OpenApiMockServer() {
-        this(80);
-    }
-
-    /**
      * Creates instance of MockServer listening on speficied port
      */
     private OpenApiMockServer(int port) {
         log.info("Starting MockServer listening on port {}", port);
-        openApiExtension = new ImportOpenApiExtension(this);
+        openApiExtension = new ImportOpenApiExtension();
         wireMockServer = new WireMockServer(
                 wireMockConfig()
                         .port(port)
@@ -98,12 +92,12 @@ public class OpenApiMockServer {
         wireMockServer.start();
     }
 
-    private void loadSpecifications(String swaggerFolder) {
-        log.info("Create swagger model from yaml files in  {}", swaggerFolder);
+    public void loadSpecifications(final String openApiFolder) {
+        log.info("Create mocks from Open API specs in  {}", openApiFolder);
 
-        File folder = new File(swaggerFolder);
+        File folder = new File(openApiFolder);
         if (folder.isDirectory()) {
-            Arrays.stream(folder.listFiles()).forEach(apiDefinition -> {
+            Arrays.stream(Objects.requireNonNull(folder.listFiles())).forEach(apiDefinition -> {
                 if (isYamlFile(apiDefinition)) {
                     createMocksFromFile(apiDefinition.toURI());
                 }

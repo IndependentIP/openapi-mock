@@ -16,6 +16,6 @@
   },
   "persistent" : true,
   "metadata" : {
-    "file_name" : "ui"
+    "specification" : "ui"
   }
 }

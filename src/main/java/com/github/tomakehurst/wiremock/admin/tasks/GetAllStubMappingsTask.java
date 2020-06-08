@@ -76,10 +76,10 @@ public class GetAllStubMappingsTask implements AdminTask {
         return stream.filter(item -> !item.getRequest().getMethod().getName().equalsIgnoreCase(RequestMethod.OPTIONS.getName()))
                 .filter(item -> Objects.nonNull(item.getName()))
                 .filter(item -> Objects.nonNull(item.getMetadata()))
-                .filter(item -> item.getMetadata().containsKey("file_name"))
-                .filter(item -> StringUtils.isNotEmpty(item.getMetadata().getString("file_name")))
+                .filter(item -> item.getMetadata().containsKey("specification"))
+                .filter(item -> StringUtils.isNotEmpty(item.getMetadata().getString("specification")))
                 // Exclude stubs of UI
-                .filter(item -> !item.getMetadata().getString("file_name").equalsIgnoreCase("ui"));
+                .filter(item -> !item.getMetadata().getString("specification").equalsIgnoreCase("ui"));
     }
 
 }

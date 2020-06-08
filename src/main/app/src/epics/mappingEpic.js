@@ -95,10 +95,10 @@ const loadMappingStubToNodesEpic = (action$, state$, { $getMappings }) =>
       const { id } = querySearch(window.location.search);
       let toggleNodeName=undefined;
 
-      //first grouping all data by file_name
+      //first grouping all data by specification
       const dataHasName = payload.mappings;
       const groupDataByFileName = dataHasName.reduce((obj, item) => {
-        obj[item.metadata.file_name] = obj[item.metadata.file_name] || [];
+        obj[item.metadata.specification] = obj[item.metadata.specification] || [];
         const hashId = _getHashId() + _getHashId();
         let node = {
           obj: item,
@@ -108,12 +108,12 @@ const loadMappingStubToNodesEpic = (action$, state$, { $getMappings }) =>
           active: item.id === id,
         };
         if(node.active){
-          toggleNodeName = item.metadata.file_name;
+          toggleNodeName = item.metadata.specification;
         }
         try {
           node.obj.response.body = JSON.parse(node.obj.response.body);
         } catch (exception) {}
-        obj[item.metadata.file_name].push(node);
+        obj[item.metadata.specification].push(node);
         return obj;
       }, {});
 
@@ -285,7 +285,7 @@ const shareGroupEpic = (action$, state$, { $importStub }) =>
         stubs = state$.value.mapping.data.mappings.flatMap(a => a.children);
       } else {
         stubs = state$.value.mapping.data.mappings.filter(
-          item => item.metadata.file_name === data.fromGroup
+          item => item.metadata.specification === data.fromGroup
         );
       }
       if (stubs) {
@@ -293,7 +293,7 @@ const shareGroupEpic = (action$, state$, { $importStub }) =>
           return {
             name: d.name,
             metadata: {
-              file_name: d.metadata.file_name,
+              specification: d.metadata.specification,
               context: data.shareContext
             },
             request: {

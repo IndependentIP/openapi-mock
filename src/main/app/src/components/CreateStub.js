@@ -58,7 +58,7 @@ const CreateStub = props => {
   const handleDefaultValue = () => {
     if (props.initialData && props.initialData.metadata) {
       const { initialData } = props;
-      groupNameRef.current.value = initialData.metadata.file_name;
+      groupNameRef.current.value = initialData.metadata.specification;
       entryNameRef.current.value = initialData.name;
       methodNameRef.current.value = initialData.request.method;
       urlPatternRef.current.value =
@@ -88,7 +88,7 @@ const CreateStub = props => {
     const data = {
       name: entryNameRef.current.value || Math.random() * (+100 - +1) + +1,
       metadata: {
-        file_name: groupNameRef.current.value || "unknown",
+        specification: groupNameRef.current.value || "unknown",
         context: context?context:undefined,
       },
       request: {

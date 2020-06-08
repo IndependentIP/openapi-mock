@@ -141,7 +141,7 @@ export default (state = initialState, action) => {
       if (action.payload.children) {
         currentGroup = action.payload.name;
       } else {
-        currentGroup = action.payload.obj.metadata.file_name;
+        currentGroup = action.payload.obj.metadata.specification;
       }
       const fromContext = action.payload.children
         ? _.get(action.payload, "children[0].obj.metadata.context", "")

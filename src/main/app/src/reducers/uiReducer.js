@@ -302,7 +302,7 @@ export default (state = initialState, action) => {
           return{...state};
         }
         let foundGroup = dataTree.children.filter(
-          group => group.name === node.metadata.file_name
+          group => group.name === node.metadata.specification
         );
 
         node.response.body = JSON.parse(node.response.body);
@@ -315,7 +315,7 @@ export default (state = initialState, action) => {
         };
 
         if (foundGroup.length === 0) {
-          foundGroup = { name: node.metadata.file_name, children: [newNode],hashId:_getHashId()};
+          foundGroup = { name: node.metadata.specification, children: [newNode],hashId:_getHashId()};
           return{
             ...state,
             rootTree:{
@@ -332,7 +332,7 @@ export default (state = initialState, action) => {
             rootTree:{
               ...state.rootTree,
               children: state.rootTree.children.map(group=>{
-                if(group.name === node.metadata.file_name){
+                if(group.name === node.metadata.specification){
                   return {
                     ...group,
                     children:[

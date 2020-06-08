@@ -33,8 +33,8 @@ import static wiremock.org.apache.commons.lang3.math.NumberUtils.isParsable;
 @Slf4j
 public class ExpectedExtension implements AdminApiExtension {
 
-    private final String ENDPOINT_NAME = "name";
-    private final String EXPECTED_PATH = "/expected/{" + ENDPOINT_NAME + "}";
+    private static final String ENDPOINT_NAME = "name";
+    private static final String EXPECTED_PATH = "/expected/{" + ENDPOINT_NAME + "}";
 
     private static final ConcurrentHashMap<String, Integer> expected = new ConcurrentHashMap<>();
 

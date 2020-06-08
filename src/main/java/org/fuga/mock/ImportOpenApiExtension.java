@@ -123,7 +123,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
                 log.debug("Extracted basepath is {}", basePath);
 
                 toStream(specification.getPaths()).forEach(paths -> {
-                    final String path = basePath + paths.getKey();
+                    final String path = ("/".equals(basePath) ? "" : basePath) + paths.getKey();
                     log.info("Creating mock(s) for path {}", path);
                     createMock(admin, createCategory(specification), path, paths.getValue());
                 });
@@ -314,7 +314,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
 
                         toStream(mediaType.getExamples()).forEach(exampleDef -> {
                             // Will create response which will be returned if expected_example header is specified
-                            MappingBuilder mapping = createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), exampleDef.getKey(), exampleDef.getValue().toString());
+                            MappingBuilder mapping = createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), exampleDef.getKey(),exampleDef.getValue().getValue().toString());
                             mapping.withMetadata(metadata().attr("specification", category).build());
                             admin.addStubMapping(
                                     mapping.build());

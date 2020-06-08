@@ -24,6 +24,8 @@ import joptsimple.OptionSet;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Objects;
@@ -57,21 +59,26 @@ public class OpenApiMockServer {
         return openApiMockServer;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         OptionParser optionParser = new OptionParser();
-        optionParser.accepts(PORT, "The port number for the server to listen on (default: 8080). 0 for dynamic port selection.").withOptionalArg().defaultsTo("8080");
-        optionParser.accepts(OPEN_API_DIR, "Specifies path to Open API specifications thart need to be loaded at bootstrapping").withOptionalArg();
+        optionParser.accepts(PORT, "The port number for the server to listen on. 0 for dynamic port selection.").withOptionalArg().defaultsTo("8080");
+        optionParser.accepts(OPEN_API_DIR, "Specifies path to Open API specifications that need to be loaded during startup").withOptionalArg();
         optionParser.accepts(HELP, "Print this message");
 
         OptionSet optionSet = optionParser.parse(args);
 
-        // Get instance of server
-        OpenApiMockServer server = getInstance(Integer.parseInt((String) optionSet.valueOf(PORT)));
+        if (optionSet.has(HELP)) {
+            optionParser.printHelpOn(System.out);
+        } else {
 
-        // bootstrap open api specifications
-        if (optionSet.has(OPEN_API_DIR)) {
-            server.loadSpecifications((String) optionSet.valueOf(OPEN_API_DIR));
+            // Get instance of server
+            OpenApiMockServer server = getInstance(Integer.parseInt((String) optionSet.valueOf(PORT)));
+
+            // bootstrap open api specifications
+            if (optionSet.has(OPEN_API_DIR)) {
+                server.loadSpecifications((String) optionSet.valueOf(OPEN_API_DIR));
+            }
         }
 
     }
@@ -106,7 +113,7 @@ public class OpenApiMockServer {
     }
 
     private void createMocksFromFile(final URI swaggerLocation) {
-        SwaggerParseResult parseResult = new OpenAPIParser().readLocation(swaggerLocation.toString(),null,null);
+        SwaggerParseResult parseResult = new OpenAPIParser().readLocation(swaggerLocation.toString(), null, null);
 
         if (parseResult.getOpenAPI() != null) {
             openApiExtension.createMocks(wireMockServer, parseResult.getOpenAPI());

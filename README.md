@@ -2,7 +2,6 @@
 
 This Creates a mock service for given OpenAPI definitions.
 
-This Project is based on Maven and plan to support Gradle also in future.
 
 # How does it work
 
@@ -11,12 +10,10 @@ This Project is based on Maven and plan to support Gradle also in future.
 ### Usage:
 
 ```
-java -jar openapi-mock.jar [options]
-
--DswaggerLocation {Path/Folder of Swagger Definitions}(TODO)
+java -jar openapi-mock.jar [options, use --help to see all options]
 ```
 
-Once started the url `http://localhost:8000/__admin/` will give you a overview of the mocked endpoints.
+Once started the url `http://localhost:<port>>` will give you a overview of the mocked endpoints.
 
 ### Build:
 

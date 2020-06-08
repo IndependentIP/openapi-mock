@@ -89,7 +89,6 @@ const UploadStub = ({
         <br></br>
         <br></br>
         <input
-          accept=".yaml"
           type="file"
           onChange={event =>
             onChooseFile(event, (elementId, event) =>

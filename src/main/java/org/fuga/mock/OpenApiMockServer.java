@@ -19,6 +19,8 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -33,6 +35,10 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 @Slf4j
 public class OpenApiMockServer {
 
+    private static final String HELP = "help";
+    private static final String PORT = "port";
+    private static final String OPEN_API_DIR = "openapi-dir";
+
     /*
      * Contains instance of created wire mock server
      */
@@ -42,9 +48,9 @@ public class OpenApiMockServer {
 
     private static OpenApiMockServer openApiMockServer = null;
 
-    public static final OpenApiMockServer getInstance() {
+    public static OpenApiMockServer getInstance(final int port) {
         if (openApiMockServer == null) {
-            openApiMockServer = new OpenApiMockServer();
+            openApiMockServer = new OpenApiMockServer(port);
         }
 
         return openApiMockServer;
@@ -52,8 +58,20 @@ public class OpenApiMockServer {
 
     public static void main(String[] args) {
 
-        // TODO: properly parse input arguments
-        getInstance().loadSpecifications("cfg");
+        OptionParser optionParser = new OptionParser();
+        optionParser.accepts(PORT, "The port number for the server to listen on (default: 8080). 0 for dynamic port selection.").withOptionalArg().defaultsTo("8080");
+        optionParser.accepts(OPEN_API_DIR, "Specifies path to Open API specifications thart need to be loaded at bootstrapping").withOptionalArg();
+        optionParser.accepts(HELP, "Print this message");
+
+        OptionSet optionSet = optionParser.parse(args);
+
+        // Get instance of server
+        OpenApiMockServer server = getInstance(Integer.parseInt((String) optionSet.valueOf(PORT)));
+
+        // bootstrap open api specifications
+        if (optionSet.has(OPEN_API_DIR)) {
+            server.loadSpecifications((String) optionSet.valueOf(OPEN_API_DIR));
+        }
 
     }
 
@@ -97,7 +115,7 @@ public class OpenApiMockServer {
         SwaggerParseResult parseResult = new OpenAPIParser().readLocation(swaggerLocation.toString(),null,null);
 
         if (parseResult.getOpenAPI() != null) {
-            openApiExtension.createMocks(parseResult.getOpenAPI());
+            openApiExtension.createMocks(wireMockServer, parseResult.getOpenAPI());
         }
     }
 

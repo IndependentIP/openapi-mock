@@ -17,6 +17,8 @@ package org.fuga.mock;
 
 import com.github.tomakehurst.wiremock.admin.Router;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.core.Admin;
+import com.github.tomakehurst.wiremock.core.WireMockApp;
 import com.github.tomakehurst.wiremock.extension.AdminApiExtension;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import io.swagger.parser.OpenAPIParser;
@@ -79,7 +81,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
 
                 if (parseResult.getOpenAPI() != null) {
                     log.info("Importing OpenAPI definition");
-                    createMocks(parseResult.getOpenAPI());
+                    createMocks(admin, parseResult.getOpenAPI());
                     return responseDefinition()
                             .withStatus(HttpStatus.SC_OK)
                             .withBody("Imported OpenAPI definition successfully")
@@ -113,7 +115,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
      * @param specification
      *         Swagger specification
      */
-    void createMocks(OpenAPI specification) {
+    void createMocks(Admin admin, OpenAPI specification) {
 
         // Create for each defined server mocks
         specification.getServers().forEach(server -> {
@@ -125,7 +127,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
                 toStream(specification.getPaths()).forEach(paths -> {
                     final String path = basePath + paths.getKey();
                     log.info("Creating mock(s) for path {}", path);
-                    createMock(path, paths.getValue());
+                    createMock(admin, path, paths.getValue());
                 });
             } catch (URISyntaxException error) {
                 log.error("Unable to retrieve basepath from url " + server.getUrl(), error);
@@ -134,11 +136,11 @@ public class ImportOpenApiExtension implements AdminApiExtension {
 
     }
 
-    private void createMock(final String url, final PathItem path) {
-        mockOperation(PathItem.HttpMethod.GET, url, path.getGet());
-        mockOperation(PathItem.HttpMethod.PUT, url, path.getPut());
-        mockOperation(PathItem.HttpMethod.POST, url, path.getPost());
-        mockOperation(PathItem.HttpMethod.DELETE, url, path.getDelete());
+    private void createMock(final Admin admin, final String url, final PathItem path) {
+        mockOperation(admin, PathItem.HttpMethod.GET, url, path.getGet());
+        mockOperation(admin, PathItem.HttpMethod.PUT, url, path.getPut());
+        mockOperation(admin, PathItem.HttpMethod.POST, url, path.getPost());
+        mockOperation(admin, PathItem.HttpMethod.DELETE, url, path.getDelete());
     }
 
     /**
@@ -243,7 +245,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
      * Creates default response for requests without mandatory parameters or
      * missing headers.
      */
-    private void createResponseBadRequest(PathItem.HttpMethod method, String url,
+    private void createResponseBadRequest(final Admin admin, PathItem.HttpMethod method, String url,
                                           Operation operation) {
         if ((operation != null) && hasMandatoryQueryParameters(operation)) {
 
@@ -261,7 +263,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
                                     "Invalid Request, missing mandatory parameter or header"))
                     .atPriority(Integer.MAX_VALUE);
 
-            stubFor(stub);
+            admin.addStubMapping(stub.build());
         }
     }
 
@@ -280,10 +282,10 @@ public class ImportOpenApiExtension implements AdminApiExtension {
         return false;
     }
 
-    private void mockOperation(final PathItem.HttpMethod method, final String url, final Operation operation) {
+    private void mockOperation(final Admin admin, final PathItem.HttpMethod method, final String url, final Operation operation) {
         if (operation != null) {
             // Create response for bad request (e,g, missing required query parameter)
-            createResponseBadRequest(method, url, operation);
+            createResponseBadRequest(admin, method, url, operation);
 
             toStream(operation.getResponses()).forEach(responseDef -> {
                 if (isParsable(responseDef.getKey())) {
@@ -296,13 +298,14 @@ public class ImportOpenApiExtension implements AdminApiExtension {
 
                         toStream(mediaType.getExamples()).forEach(exampleDef -> {
                             // Will create response which will be returned if expected_example header is specified
-                            stubFor(
-                                    createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), exampleDef.getKey(), exampleDef.getValue().toString()));
+                            admin.addStubMapping(
+                                    createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), exampleDef.getKey(), exampleDef.getValue().toString()).build());
                         });
 
                         Optional.ofNullable(mediaType.getExample()).ifPresent(example -> {
                             // Will create response that is always returned
-                            stubFor(createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), "default", example.toString()));
+                            admin.addStubMapping(
+                                    createResponseExample(method, url, operation, responseStatus, mediaTypeDef.getKey(), "default", example.toString()).build());
                         });
                     });
                 } else {

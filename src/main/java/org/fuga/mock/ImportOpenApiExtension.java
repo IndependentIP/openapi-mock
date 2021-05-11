@@ -223,8 +223,7 @@ public class ImportOpenApiExtension implements AdminApiExtension {
         log.debug("Adding examples {}", exampleKey);
         if (!"default".equalsIgnoreCase(exampleKey)) {
             // In case not default response example expected-example header must match
-            mock.andMatching(value -> MatchResult.of(exampleKey.equalsIgnoreCase(value.getHeader(EXPECTED_EXAMPLE)))
-            );
+            mock.withHeader(EXPECTED_EXAMPLE, equalToIgnoreCase(exampleKey));
         }
 
         if (responseStatus != 200) {

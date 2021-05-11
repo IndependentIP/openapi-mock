@@ -22,7 +22,7 @@
     <groupId>org.fuga</groupId>
     <artifactId>openapi-mock</artifactId>
     <name>OpenAPI Mock</name>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.1-SNAPSHOT</version>
     <inceptionYear>2020</inceptionYear>
     <packaging>jar</packaging>
 

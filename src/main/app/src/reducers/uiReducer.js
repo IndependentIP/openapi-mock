@@ -90,7 +90,7 @@ export default (state = initialState, action) => {
           };
         } else {
           //does toggle the stub node?
-          const foundChild = false;
+          let foundChild = false;
           const newChildren = node.children.map(stub => {
             if (stub.hashId === hashId) {
               foundChild = true;

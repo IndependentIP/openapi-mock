@@ -1,12 +1,12 @@
 {
   "name" : "icon.png",
   "request" : {
-    "urlPattern" : "/static/media/OpenAPI-Mock.logo.png",
+    "urlPattern" : "/static/media/.*png",
     "method" : "GET"
   },
   "response" : {
     "status" : 200,
-    "bodyFileName": "app/OpenAPI-Mock-logo.png",
+    "bodyFileName": "app{{request.path}}",
     "headers" : {
       "content-type" : "image/png",
       "Access-Control-Allow-Origin" : "*",

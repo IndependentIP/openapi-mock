@@ -1,12 +1,12 @@
 {
-  "name" : "fontawesome-woff",
+  "name" : "fontawesome-ttf",
   "request" : {
-    "urlPattern" : "/static/media/fontawesome-webfont.woff",
+    "urlPattern" : "/static/media/.*",
     "method" : "GET"
   },
   "response" : {
     "status" : 200,
-    "bodyFileName": "app/static/media/fontawesome-webfont.woff",
+    "bodyFileName": "app{{request.path}}",
     "headers" : {
       "content-type" : "text/css",
       "Access-Control-Allow-Origin" : "*",

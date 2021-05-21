@@ -1,12 +1,12 @@
 {
   "name" : "app.css",
   "request" : {
-    "urlPattern" : "/static/css/main.css",
+    "urlPattern" : "/static/css/.*",
     "method" : "GET"
   },
   "response" : {
     "status" : 200,
-    "bodyFileName": "app/static/css/main.css",
+    "bodyFileName": "app{{request.path}}",
     "headers" : {
       "content-type" : "text/css",
       "Access-Control-Allow-Origin" : "*",

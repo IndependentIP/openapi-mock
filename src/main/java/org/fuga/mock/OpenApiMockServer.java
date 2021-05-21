@@ -17,6 +17,7 @@ package org.fuga.mock;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
+import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import joptsimple.OptionParser;
@@ -95,6 +96,7 @@ public class OpenApiMockServer {
                         .notifier(new Slf4jNotifier(true))
                         .extensions(ExpectedExtension.class)
                         .extensions(openApiExtension)
+                        .extensions(new ResponseTemplateTransformer(true))
                         .usingFilesUnderClasspath("ui"));
         wireMockServer.start();
     }

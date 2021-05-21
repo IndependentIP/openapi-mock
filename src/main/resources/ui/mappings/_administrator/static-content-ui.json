@@ -1,14 +1,14 @@
 {
-  "name" : "fontawesome-ttf",
+  "name" : "static-content-ui",
   "request" : {
-    "urlPattern" : "/static/media/fontawesome-webfont.ttf",
+    "urlPathPattern" : "/static/.*",
     "method" : "GET"
   },
   "response" : {
     "status" : 200,
-    "bodyFileName": "app/static/media/fontawesome-webfont.ttf",
+    "bodyFileName": "app{{request.path}}",
     "headers" : {
-      "content-type" : "text/css",
+      "content-type" : "text/html",
       "Access-Control-Allow-Origin" : "*",
       "Access-Control-Allow-Methods" : "*",
       "Access-Control-Allow-Headers" : "authorization,caller-id,channel,content-type,correlation-id,device-info,session-id,timestamp"

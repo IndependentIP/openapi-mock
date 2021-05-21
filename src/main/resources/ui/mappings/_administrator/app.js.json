@@ -1,12 +1,12 @@
 {
   "name" : "app.js",
   "request" : {
-    "urlPattern" : "/static/js/main.js",
+    "urlPattern" : "/static/js/.*",
     "method" : "GET"
   },
   "response" : {
     "status" : 200,
-    "bodyFileName": "app/static/js/main.js",
+    "bodyFileName": "app{{request.path}}",
     "headers" : {
       "content-type" : "text/html",
       "Access-Control-Allow-Origin" : "*",

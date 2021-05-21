@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import React, { PureComponent } from "react";
-import logoOpenApiMock from "../../public/OpenAPI-Mock-logo.png";
+import logoOpenApiMock from "./../OpenAPI-Mock-logo.png";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import _ from "lodash";
 import { __esModule } from "react-treebeard/dist";
@@ -27,9 +27,6 @@ import { connect } from "react-redux";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-library.add(
-  fas,
-)
 
 import Request from "./Request";
 import Response from "./Response";
@@ -58,6 +55,10 @@ import {
   toggleNodeById,
   switchNewContext
 } from "../actions";
+
+library.add(
+  fas,
+)
 
 class WhyMock extends PureComponent {
   state = {

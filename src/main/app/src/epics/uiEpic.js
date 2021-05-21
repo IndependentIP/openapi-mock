@@ -103,7 +103,7 @@ const deleteStubEpic = (action$, state$, { $deleteStub }) =>
       }
 
       if (confirmOnDelete || confirmOnDelete === undefined) {
-        if (confirm('Can you confirm delete "' + name + '" ?')) {
+        if (window.confirm('Can you confirm delete "' + name + '" ?')) {
           return $deleteStub(id).pipe(map(() => deleteStubSuccess(id)));
         }
       } else {

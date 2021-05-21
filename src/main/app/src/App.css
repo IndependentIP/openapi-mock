@@ -331,7 +331,7 @@ height:44px;
 	text-transform: uppercase;
 	border-radius: 1rem;
 	font-family: 'Courier';
-	-webkit-mask-image: url('../public/grunge.png');
+	-webkit-mask-image: url('grunge.png');
   -webkit-mask-size: 944px 604px;
   mix-blend-mode: multiply;
 }

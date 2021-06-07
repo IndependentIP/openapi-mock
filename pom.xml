@@ -53,7 +53,7 @@
 
         <!-- Version(s) dependencies, etc -->
         <version.junit>4.13.1</version.junit>
-        <version.logback>1.0.1</version.logback>
+        <version.logback>1.2.0</version.logback>
         <version.lombok>1.18.12</version.lombok>
         <version.node>v16.1.0</version.node>
         <version.slf4j>1.6.4</version.slf4j>
